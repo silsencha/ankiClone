@@ -6,6 +6,7 @@ let editingId = null;
 let loaded = false;
 
 const STORAGE_KEY = "cards";
+const PROGRESS_KEY = "progress";
 
 function uid() {
   return "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -43,27 +44,36 @@ async function loadCards() {
   } catch (e) {
     cards = seedCards();
   }
+
+  try {
+    const prog = await window.storage.get(PROGRESS_KEY, false);
+    if (prog) {
+      const p = JSON.parse(prog.value);
+      if (typeof p.currentIndex === "number") currentIndex = p.currentIndex;
+      if (typeof p.view === "string") view = p.view;
+    }
+  } catch (e) {
+    /* no saved progress yet, defaults are fine */
+  }
+
+  if (currentIndex >= cards.length) currentIndex = 0;
   loaded = true;
 }
 
+async function saveProgress() {
+  try {
+    await window.storage.set(
+      PROGRESS_KEY,
+      JSON.stringify({ currentIndex, view }),
+      false,
+    );
+  } catch (e) {
+    /* progress is a nice-to-have; fail silently */
+  }
+}
+
 function seedCards() {
-  return [
-    {
-      id: uid(),
-      front: "Ephemeral",
-      back: "Lasting for a very short time.",
-    },
-    {
-      id: uid(),
-      front: "Ubiquitous",
-      back: "Present, appearing, or found everywhere.",
-    },
-    {
-      id: uid(),
-      front: "Serendipity",
-      back: "A pleasant surprise; finding something good without looking for it.",
-    },
-  ];
+  return [];
 }
 
 async function saveCards() {
@@ -82,6 +92,7 @@ function setView(v) {
     .getElementById("tabManage")
     .classList.toggle("active", v === "manage");
   render();
+  saveProgress();
 }
 
 function render() {
@@ -154,12 +165,14 @@ function prevCard() {
   flipped = false;
   currentIndex = (currentIndex - 1 + cards.length) % cards.length;
   render();
+  saveProgress();
 }
 
 function nextCard() {
   flipped = false;
   currentIndex = (currentIndex + 1) % cards.length;
   render();
+  saveProgress();
 }
 
 function renderManage(main) {
@@ -281,6 +294,7 @@ async function deleteCard(id) {
   if (currentIndex >= cards.length)
     currentIndex = Math.max(0, cards.length - 1);
   await saveCards();
+  await saveProgress();
   showToast("Card deleted.");
   renderWordList();
   document.getElementById("countChip").textContent = cards.length
@@ -292,5 +306,11 @@ async function deleteCard(id) {
   document.getElementById("tabStudy").classList.add("active");
   render();
   await loadCards();
+  document
+    .getElementById("tabStudy")
+    .classList.toggle("active", view === "study");
+  document
+    .getElementById("tabManage")
+    .classList.toggle("active", view === "manage");
   render();
 })();
