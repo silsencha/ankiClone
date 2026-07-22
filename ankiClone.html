@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Word Catalog</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Courier+Prime:wght@400;700&display=swap');
+
+:root{
+  --desk: #2b2620;
+  --desk-dark: #221e19;
+  --card: #f3ecda;
+  --card-line: #cabf9f;
+  --ink: #26221a;
+  --ink-soft: #6b6250;
+  --red: #a5372c;
+  --red-dark: #7e2a21;
+  --green: #3f6e5b;
+  --gold: #b3924f;
+  --shadow: rgba(0,0,0,0.45);
+}
+
+*{ box-sizing: border-box; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse at top, #3a332a 0%, var(--desk) 55%, var(--desk-dark) 100%);
+  font-family: 'Source Serif 4', Georgia, serif;
+  color: var(--ink);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding: 28px 16px 60px;
+}
+
+.wrap{ width:100%; max-width:640px; }
+
+/* ---- Header: drawer label ---- */
+.drawer-label{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background: linear-gradient(180deg, #3d362c, #322b22);
+  border: 1px solid #4a4235;
+  border-bottom: 3px solid #1a1611;
+  border-radius: 6px 6px 3px 3px;
+  padding: 14px 20px;
+  box-shadow: 0 6px 14px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.drawer-label .brass{
+  width:34px; height:12px;
+  background: linear-gradient(180deg, #d9be7a, #a8843f);
+  border-radius: 3px;
+  border: 1px solid #7a5f2c;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.drawer-title{
+  font-family: 'Special Elite', 'Courier Prime', monospace;
+  letter-spacing: 2px;
+  color: #e9ddc2;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.drawer-title small{
+  display:block;
+  font-size: 10px;
+  color: #a99c7d;
+  letter-spacing: 1.5px;
+  margin-top: 2px;
+}
+.due-stamp{
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  color: #e9ddc2;
+  border: 1px solid #7a6b4d;
+  padding: 5px 10px;
+  border-radius: 3px;
+  letter-spacing: 1px;
+}
+.due-stamp b{ color: #e2b04a; font-size:14px; }
+
+/* ---- Tabs ---- */
+.tabs{
+  display:flex;
+  gap: 4px;
+  margin: 18px 0 20px;
+}
+.tab{
+  flex:1;
+  text-align:center;
+  font-family: 'Courier Prime', monospace;
+  font-weight:700;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 10px 6px;
+  background: #3a332a;
+  color: #b9ac8c;
+  border: 1px solid #4a4235;
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+  cursor:pointer;
+  transition: all .15s ease;
+}
+.tab:hover{ color: #e9ddc2; }
+.tab.active{
+  background: var(--card);
+  color: var(--ink);
+  border-color: var(--card-line);
+}
+
+.panel{
+  background: var(--card);
+  border: 1px solid var(--card-line);
+  border-radius: 0 0 8px 8px;
+  padding: 26px;
+  box-shadow: 0 12px 28px var(--shadow);
+  min-height: 320px;
+}
+.panel[hidden]{ display:none; }
+
+/* ---- Study card ---- */
+.stage{
+  perspective: 1400px;
+  margin: 6px auto 22px;
+  max-width: 420px;
+}
+.index-card{
+  position:relative;
+  min-height: 220px;
+  background:
+    repeating-linear-gradient(var(--card) 0 27px, var(--card-line) 27px 28px),
+    var(--card);
+  background-position: 0 46px, 0 0;
+  border: 1px solid var(--card-line);
+  border-radius: 4px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 2px 0 #e3d9bd inset;
+  padding: 34px 24px 24px;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.index-card:active{ transform: scale(0.995); }
+.index-card::before{
+  content:"";
+  position:absolute;
+  left:0; top:0; bottom:0;
+  width: 34px;
+  border-right: 1.5px solid var(--red);
+  opacity: 0.55;
+}
+.card-eyebrow{
+  font-family:'Special Elite', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.card-face{
+  font-size: 26px;
+  line-height: 1.35;
+  color: var(--ink);
+  word-break: break-word;
+}
+.card-back{
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1.5px dashed var(--card-line);
+  font-size: 18px;
+  color: var(--ink);
+  font-style: italic;
+  display:none;
+}
+.card-back.shown{ display:block; }
+.tap-hint{
+  text-align:center;
+  font-family:'Courier Prime', monospace;
+  font-size: 11px;
+  color: var(--ink-soft);
+  letter-spacing: 1px;
+  margin-top: 8px;
+}
+
+.rate-row{
+  display:grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 8px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.rate-btn{
+  font-family:'Courier Prime', monospace;
+  font-weight:700;
+  font-size: 12px;
+  letter-spacing: .5px;
+  padding: 12px 4px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  cursor:pointer;
+  color: #fff;
+  text-transform: uppercase;
+}
+.rate-btn small{ display:block; font-weight:400; font-size:10px; opacity:.85; margin-top:2px; }
+.rate-again{ background: var(--red-dark); }
+.rate-hard{ background: #8a6a2e; }
+.rate-good{ background: var(--green); }
+.rate-easy{ background: #2f5a8f; }
+.rate-btn:hover{ filter: brightness(1.1); }
+.rate-btn:disabled{ opacity:.4; cursor:default; }
+
+.empty-state{
+  text-align:center;
+  padding: 40px 10px;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+.empty-state .big{
+  font-family:'Special Elite', monospace;
+  font-style:normal;
+  font-size: 13px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color: var(--ink);
+  margin-bottom:8px;
+}
+
+/* ---- Add form ---- */
+label{
+  display:block;
+  font-family:'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 14px 0 6px;
+}
+input[type=text], textarea{
+  width:100%;
+  font-family:'Source Serif 4', Georgia, serif;
+  font-size: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--card-line);
+  border-radius: 4px;
+  background: #fbf8ee;
+  color: var(--ink);
+  resize: vertical;
+}
+input[type=text]:focus, textarea:focus{
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+.add-btn{
+  margin-top:18px;
+  font-family:'Courier Prime', monospace;
+  font-weight:700;
+  letter-spacing: 1px;
+  text-transform:uppercase;
+  font-size: 13px;
+  background: var(--red);
+  color: #fff;
+  border:none;
+  padding: 12px 22px;
+  border-radius: 4px;
+  cursor:pointer;
+}
+.add-btn:hover{ filter: brightness(1.08); }
+.add-btn:disabled{ opacity:.5; cursor:default; }
+.form-msg{
+  font-family:'Courier Prime', monospace;
+  font-size: 12px;
+  color: var(--green);
+  margin-top: 10px;
+  min-height: 16px;
+}
+
+/* ---- Manage list ---- */
+.manage-list{ list-style:none; margin:0; padding:0; }
+.manage-item{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--card-line);
+}
+.manage-item:last-child{ border-bottom:none; }
+.mi-text{ flex:1; min-width:0; }
+.mi-front{ font-weight:600; }
+.mi-back{ color: var(--ink-soft); font-style: italic; font-size: 14px; }
+.mi-meta{
+  font-family:'Courier Prime', monospace;
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 4px;
+  letter-spacing: .5px;
+}
+.mi-del{
+  font-family:'Courier Prime', monospace;
+  font-size: 11px;
+  background: none;
+  border: 1px solid var(--red);
+  color: var(--red);
+  padding: 5px 9px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.mi-del:hover{ background: var(--red); color:#fff; }
+.search-row{ margin-bottom: 6px; }
+.count-line{
+  font-family:'Courier Prime', monospace;
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+}
+.loading{ text-align:center; color: var(--ink-soft); font-style:italic; padding: 30px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="drawer-label">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div class="brass"></div>
+      <div class="drawer-title">Word Catalog<small>your own vocabulary deck</small></div>
+    </div>
+    <div class="due-stamp">DUE TODAY <b id="dueCount">–</b></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="study">Study</div>
+    <div class="tab" data-tab="add">Add Word</div>
+    <div class="tab" data-tab="manage">Manage</div>
+  </div>
+
+  <div class="panel" id="panel-study">
+    <div id="studyArea"><div class="loading">Opening the drawer…</div></div>
+  </div>
+
+  <div class="panel" id="panel-add" hidden>
+    <label for="frontInput">Word / Front</label>
+    <input type="text" id="frontInput" placeholder="e.g. ephemeral" maxlength="200">
+    <label for="backInput">Meaning / Back</label>
+    <textarea id="backInput" rows="3" placeholder="e.g. lasting for a very short time"></textarea>
+    <button class="add-btn" id="addBtn">File this card</button>
+    <div class="form-msg" id="formMsg"></div>
+  </div>
+
+  <div class="panel" id="panel-manage" hidden>
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="Search your cards…">
+    </div>
+    <div class="count-line" id="manageCount"></div>
+    <ul class="manage-list" id="manageList"></ul>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'wordcatalog:cards';
+  let cards = [];
+  let queue = [];
+  let current = null;
+  let answerShown = false;
+  let loaded = false;
+
+  const el = id => document.getElementById(id);
+  const now = () => Date.now();
+  const DAY = 24*60*60*1000;
+
+  function newCard(front, back){
+    return {
+      id: 'c' + Date.now() + Math.random().toString(36).slice(2,8),
+      front: front.trim(),
+      back: back.trim(),
+      ease: 2.5,
+      interval: 0,
+      reps: 0,
+      due: now(),
+      created: now()
+    };
+  }
+
+  async function loadCards(){
+    try{
+      const res = await window.storage.get(STORAGE_KEY, false);
+      cards = res && res.value ? JSON.parse(res.value) : [];
+    }catch(e){
+      cards = [];
+    }
+    loaded = true;
+  }
+
+  async function saveCards(){
+    try{
+      await window.storage.set(STORAGE_KEY, JSON.stringify(cards), false);
+    }catch(e){
+      console.error('Could not save cards', e);
+    }
+  }
+
+  function buildQueue(){
+    const t = now();
+    queue = cards.filter(c => c.due <= t).sort((a,b) => a.due - b.due);
+  }
+
+  function dueCountToday(){
+    return cards.filter(c => c.due <= now()).length;
+  }
+
+  function refreshDueStamp(){
+    el('dueCount').textContent = dueCountToday();
+  }
+
+  function renderStudy(){
+    refreshDueStamp();
+    buildQueue();
+    const area = el('studyArea');
+    if(cards.length === 0){
+      area.innerHTML = `<div class="empty-state">
+        <div class="big">Catalog is empty</div>
+        No cards yet. Go to “Add Word” to file your first one.
+      </div>`;
+      current = null;
+      return;
+    }
+    if(queue.length === 0){
+      area.innerHTML = `<div class="empty-state">
+        <div class="big">All caught up</div>
+        Nothing due right now. Come back later, or add more words.
+      </div>`;
+      current = null;
+      return;
+    }
+    current = queue[0];
+    answerShown = false;
+    area.innerHTML = `
+      <div class="stage">
+        <div class="index-card" id="indexCard">
+          <div class="card-eyebrow">Card ${cards.length - queue.length + 1} of ${cards.length} filed &middot; ${dueCountToday()} due</div>
+          <div class="card-face">${escapeHtml(current.front)}</div>
+          <div class="card-back" id="cardBack">${escapeHtml(current.back)}</div>
+        </div>
+        <div class="tap-hint" id="tapHint">tap the card to reveal the answer</div>
+      </div>
+      <div class="rate-row">
+        <button class="rate-btn rate-again" data-r="again" disabled>Again<small>&lt;1m</small></button>
+        <button class="rate-btn rate-hard" data-r="hard" disabled>Hard<small>soon</small></button>
+        <button class="rate-btn rate-good" data-r="good" disabled>Good<small>1d+</small></button>
+        <button class="rate-btn rate-easy" data-r="easy" disabled>Easy<small>4d+</small></button>
+      </div>
+    `;
+    el('indexCard').addEventListener('click', revealAnswer);
+    area.querySelectorAll('.rate-btn').forEach(b => b.addEventListener('click', () => rate(b.dataset.r)));
+  }
+
+  function revealAnswer(){
+    if(answerShown) return;
+    answerShown = true;
+    el('cardBack').classList.add('shown');
+    el('tapHint').textContent = 'choose how well you knew it';
+    document.querySelectorAll('.rate-btn').forEach(b => b.disabled = false);
+  }
+
+  function rate(r){
+    if(!current) return;
+    const c = current;
+    if(r === 'again'){
+      c.reps = 0;
+      c.ease = Math.max(1.3, c.ease - 0.2);
+      c.interval = 0;
+      c.due = now() + 60*1000; // back in ~1 minute, will resurface this session/soon
+    } else if(r === 'hard'){
+      c.ease = Math.max(1.3, c.ease - 0.15);
+      c.interval = c.reps === 0 ? 1 : Math.max(1, Math.round(c.interval * 1.2));
+      c.reps += 1;
+      c.due = now() + c.interval * DAY;
+    } else if(r === 'good'){
+      if(c.reps === 0) c.interval = 1;
+      else if(c.reps === 1) c.interval = 6;
+      else c.interval = Math.round(c.interval * c.ease);
+      c.reps += 1;
+      c.due = now() + c.interval * DAY;
+    } else if(r === 'easy'){
+      c.interval = c.reps === 0 ? 4 : Math.round((c.interval || 1) * c.ease * 1.3) + 1;
+      c.ease = c.ease + 0.15;
+      c.reps += 1;
+      c.due = now() + c.interval * DAY;
+    }
+    saveCards();
+    renderStudy();
+  }
+
+  function escapeHtml(s){
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  // ---- Add form ----
+  el('addBtn').addEventListener('click', async () => {
+    const front = el('frontInput').value.trim();
+    const back = el('backInput').value.trim();
+    const msg = el('formMsg');
+    if(!front || !back){
+      msg.style.color = 'var(--red)';
+      msg.textContent = 'Both the word and its meaning are needed.';
+      return;
+    }
+    el('addBtn').disabled = true;
+    cards.push(newCard(front, back));
+    await saveCards();
+    el('frontInput').value = '';
+    el('backInput').value = '';
+    msg.style.color = 'var(--green)';
+    msg.textContent = 'Filed. Ready to study whenever it comes due.';
+    el('addBtn').disabled = false;
+    el('frontInput').focus();
+    refreshDueStamp();
+  });
+  el('frontInput').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); el('backInput').focus(); } });
+
+  // ---- Manage ----
+  function renderManage(filter){
+    const list = el('manageList');
+    const term = (filter || '').toLowerCase();
+    const shown = cards
+      .filter(c => !term || c.front.toLowerCase().includes(term) || c.back.toLowerCase().includes(term))
+      .sort((a,b) => b.created - a.created);
+    el('manageCount').textContent = `${cards.length} card${cards.length===1?'':'s'} in the catalog`;
+    if(shown.length === 0){
+      list.innerHTML = `<div class="empty-state"><div class="big">Nothing here</div>${cards.length ? 'No cards match your search.' : 'Add your first word to get started.'}</div>`;
+      return;
+    }
+    list.innerHTML = shown.map(c => {
+      const status = c.due <= now() ? 'due now' : 'due ' + new Date(c.due).toLocaleDateString();
+      return `<li class="manage-item" data-id="${c.id}">
+        <div class="mi-text">
+          <div class="mi-front">${escapeHtml(c.front)}</div>
+          <div class="mi-back">${escapeHtml(c.back)}</div>
+          <div class="mi-meta">${status} &middot; reviewed ${c.reps} time${c.reps===1?'':'s'}</div>
+        </div>
+        <button class="mi-del" data-id="${c.id}">Remove</button>
+      </li>`;
+    }).join('');
+    list.querySelectorAll('.mi-del').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        cards = cards.filter(c => c.id !== btn.dataset.id);
+        await saveCards();
+        renderManage(el('searchInput').value);
+        refreshDueStamp();
+      });
+    });
+  }
+  el('searchInput').addEventListener('input', e => renderManage(e.target.value));
+
+  // ---- Tabs ----
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      ['study','add','manage'].forEach(name => {
+        el('panel-' + name).hidden = (name !== tab.dataset.tab);
+      });
+      if(tab.dataset.tab === 'study') renderStudy();
+      if(tab.dataset.tab === 'manage') renderManage(el('searchInput').value);
+    });
+  });
+
+  // ---- Init ----
+  (async function init(){
+    await loadCards();
+    renderStudy();
+    renderManage('');
+  })();
+})();
+</script>
+</body>
+</html>
