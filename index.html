@@ -4,63 +4,52 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
-    <title>Word Catalog</title>
+    <title>Flashcards</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="wrap">
-      <div class="drawer-label">
-        <div style="display: flex; align-items: center; gap: 12px">
-          <div class="brass"></div>
-          <div class="drawer-title">
-            Word Catalog<small>your own vocabulary deck</small>
-          </div>
-        </div>
-        <div class="due-stamp">DUE TODAY <b id="dueCount">–</b></div>
-      </div>
-
-      <div class="tabs">
-        <div class="tab active" data-tab="study">Study</div>
-        <div class="tab" data-tab="add">Add Word</div>
-        <div class="tab" data-tab="manage">Manage</div>
-      </div>
-
-      <div class="panel" id="panel-study">
-        <div id="studyArea"><div class="loading">Opening the drawer…</div></div>
-      </div>
-
-      <div class="panel" id="panel-add" hidden>
-        <label for="frontInput">Word / Front</label>
-        <input
-          type="text"
-          id="frontInput"
-          placeholder="e.g. ephemeral"
-          maxlength="200"
-        />
-        <label for="backInput">Meaning / Back</label>
-        <textarea
-          id="backInput"
-          rows="3"
-          placeholder="e.g. lasting for a very short time"
-        ></textarea>
-        <button class="add-btn" id="addBtn">File this card</button>
-        <div class="form-msg" id="formMsg"></div>
-      </div>
-
-      <div class="panel" id="panel-manage" hidden>
-        <div class="search-row">
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Search your cards…"
-          />
-        </div>
-        <div class="count-line" id="manageCount"></div>
-        <ul class="manage-list" id="manageList"></ul>
-      </div>
+    <div id="app">
+      <header class="topbar">
+        <h1>Flashcards</h1>
+        <span class="count-chip" id="countChip"></span>
+      </header>
+      <main id="main"></main>
     </div>
+
+    <nav class="tabbar">
+      <div class="tabbar-inner">
+        <button class="tab-btn" id="tabStudy" onclick="setView('study')">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+          >
+            <rect x="3" y="5" width="14" height="10" rx="2" />
+            <rect x="7" y="9" width="14" height="10" rx="2" fill="none" />
+          </svg>
+          Study
+        </button>
+        <button class="tab-btn" id="tabManage" onclick="setView('manage')">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+          >
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.55V21a2 2 0 11-4 0v-.09a1.7 1.7 0 00-1-1.55 1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.7 1.7 0 00.34-1.87 1.7 1.7 0 00-1.55-1H3a2 2 0 110-4h.09a1.7 1.7 0 001.55-1 1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 112.83-2.83l.06.06a1.7 1.7 0 001.87.34H9a1.7 1.7 0 001-1.55V3a2 2 0 114 0v.09a1.7 1.7 0 001 1.55 1.7 1.7 0 001.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06a1.7 1.7 0 00-.34 1.87V9a1.7 1.7 0 001.55 1H21a2 2 0 110 4h-.09a1.7 1.7 0 00-1.55 1z"
+            />
+          </svg>
+          Manage
+        </button>
+      </div>
+    </nav>
+
+    <div class="toast" id="toast"></div>
 
     <script src="script.js"></script>
   </body>
